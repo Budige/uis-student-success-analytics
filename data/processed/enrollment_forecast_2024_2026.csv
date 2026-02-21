@@ -1,0 +1,4 @@
+year,forecast_baseline,forecast_lower_ci,forecast_upper_ci,forecast_optimistic,forecast_conservative,model,mape_pct,rmse
+2024,4306,4156,4455,4468,4358,Holt Linear Trend,2.21,100.0
+2025,4209,4060,4359,4535,4314,Holt Linear Trend,2.21,100.0
+2026,4113,3963,4262,4603,4271,Holt Linear Trend,2.21,100.0

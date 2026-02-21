@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.pyc
+.env
+venv/
+.venv/
+
+# Data (large files)
+# data/raw/*.csv  # Keeping CSVs - they're the real IPEDS data
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

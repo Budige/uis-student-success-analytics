@@ -1,0 +1,30 @@
+# UIS Student Success Analytics - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core data processing
+pandas==2.2.0
+numpy==1.26.4
+scipy==1.12.0
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.28
+
+# Visualization
+matplotlib==3.8.3
+seaborn==0.13.2
+
+# Statistical modeling
+# statsmodels==0.14.1   # Optional: for ARIMA - commented, using custom implementation
+
+# Jupyter (for notebooks)
+jupyter==1.0.0
+ipykernel==6.29.0
+
+# Code quality
+pytest==8.0.0
+black==24.1.1
+flake8==7.0.0
+
+# Documentation
+mkdocs==1.5.3

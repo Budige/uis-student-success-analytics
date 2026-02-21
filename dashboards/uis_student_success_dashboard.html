@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UIS Student Success Analytics Dashboard | OIRE</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --uis-blue: #003366;
+            --uis-orange: #E84A27;
+            --uis-light-blue: #0066CC;
+            --uis-dark: #1a1a2e;
+            --bg-main: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-sidebar: #003366;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --danger: #e53e3e;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 25px rgba(0,51,102,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ─────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, var(--uis-blue) 0%, #004080 60%, #005599 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 32px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--uis-orange);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 1px;
+        }
+
+        .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .header-badge {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .header-badge.live {
+            background: rgba(56,161,105,0.25);
+            border-color: rgba(56,161,105,0.5);
+            color: #9AE6B4;
+        }
+
+        /* ── NAV TABS ──────────────────────────────── */
+        .nav-tabs {
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            padding: 0 32px;
+            max-width: 1600px;
+            margin: 0 auto;
+            gap: 2px;
+        }
+
+        .nav-tab {
+            padding: 10px 22px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover { color: white; background: rgba(255,255,255,0.08); }
+
+        .nav-tab.active {
+            color: white;
+            border-bottom-color: var(--uis-orange);
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* ── MAIN LAYOUT ───────────────────────────── */
+        .main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+
+        /* ── KPI CARDS ─────────────────────────────── */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--uis-blue);
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 60px; height: 60px;
+            border-radius: 0 0 0 60px;
+            opacity: 0.06;
+        }
+
+        .kpi-card.blue { border-left-color: var(--uis-blue); }
+        .kpi-card.blue::after { background: var(--uis-blue); }
+        .kpi-card.orange { border-left-color: var(--uis-orange); }
+        .kpi-card.orange::after { background: var(--uis-orange); }
+        .kpi-card.green { border-left-color: var(--success); }
+        .kpi-card.green::after { background: var(--success); }
+        .kpi-card.purple { border-left-color: #7c3aed; }
+        .kpi-card.purple::after { background: #7c3aed; }
+        .kpi-card.teal { border-left-color: #0d9488; }
+        .kpi-card.teal::after { background: #0d9488; }
+
+        .kpi-icon { font-size: 1.6rem; margin-bottom: 8px; }
+        .kpi-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .kpi-change {
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .kpi-change.up { color: var(--success); }
+        .kpi-change.down { color: var(--danger); }
+        .kpi-change.neutral { color: var(--text-light); }
+
+        .kpi-sub {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* ── CHARTS GRID ───────────────────────────── */
+        .charts-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .charts-row-equal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.25s;
+        }
+
+        .chart-card:hover { box-shadow: var(--shadow-hover); }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--uis-blue);
+        }
+
+        .card-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 3px;
+        }
+
+        .card-badge {
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-blue { background: #EBF4FF; color: var(--uis-blue); }
+        .badge-green { background: #F0FFF4; color: #276749; }
+        .badge-orange { background: #FFF5EE; color: #C05621; }
+        .badge-purple { background: #FAF5FF; color: #553C9A; }
+
+        .chart-container { position: relative; }
+
+        /* ── BENCHMARK TABLE ────────────────────────── */
+        .bench-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .bench-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--bg-main);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.73rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .bench-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .bench-table tr:hover td { background: #f7fafc; }
+
+        .bench-table tr.uis-row td {
+            background: #EBF4FF;
+            font-weight: 700;
+            color: var(--uis-blue);
+        }
+
+        .bench-bar-cell { width: 100px; }
+
+        .bench-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #E2E8F0;
+            overflow: hidden;
+        }
+
+        .bench-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--uis-light-blue), var(--uis-blue));
+            transition: width 1s ease;
+        }
+
+        .bench-bar-fill.uis { background: linear-gradient(90deg, var(--uis-orange), #c0392b); }
+
+        /* ── EQUITY PANEL ───────────────────────────── */
+        .equity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .equity-item {
+            background: var(--bg-main);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .equity-label {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .equity-val { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+        .equity-gap { font-size: 0.78rem; font-weight: 600; }
+
+        .gap-critical { color: var(--danger); }
+        .gap-moderate { color: var(--warning); }
+        .gap-good { color: var(--success); }
+
+        /* ── PROGRESS BARS ──────────────────────────── */
+        .progress-list { display: flex; flex-direction: column; gap: 14px; }
+
+        .progress-item {}
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .progress-name { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
+        .progress-vals { font-size: 0.78rem; color: var(--text-light); }
+
+        .progress-track {
+            height: 10px;
+            background: #E2E8F0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1.2s ease;
+        }
+
+        /* ── FOOTER ─────────────────────────────────── */
+        .footer {
+            background: var(--uis-blue);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 16px;
+            font-size: 0.75rem;
+            margin-top: 32px;
+        }
+
+        .footer a { color: rgba(255,255,255,0.9); text-decoration: none; }
+
+        /* ── RESPONSIVE ─────────────────────────────── */
+        @media (max-width: 1200px) {
+            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .main { padding: 16px; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-row-equal { grid-template-columns: 1fr; }
+        }
+
+        /* ── PAGE SECTIONS (tabs) ───────────────────── */
+        .page { display: none; }
+        .page.active { display: block; }
+
+        /* ── INSIGHT CARDS ──────────────────────────── */
+        .insight-bar {
+            background: linear-gradient(135deg, #EBF4FF 0%, #E8F4FD 100%);
+            border: 1px solid #BEE3F8;
+            border-left: 4px solid var(--uis-blue);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 0.82rem;
+            color: var(--uis-blue);
+        }
+
+        .insight-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--uis-blue);
+            margin: 24px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-inner">
+        <div class="logo-area">
+            <div class="logo-icon">UIS</div>
+            <div class="logo-text">
+                <h1>Student Success Analytics Dashboard</h1>
+                <p>Office of Institutional Research &amp; Effectiveness (OIRE) | University of Illinois Springfield</p>
+            </div>
+        </div>
+        <div class="header-meta">
+            <span class="header-badge live">● IPEDS Data</span>
+            <span class="header-badge">Unit ID: 145813</span>
+            <span class="header-badge">AY 2014–2023</span>
+            <span class="header-badge">Built: Feb 2026</span>
+        </div>
+    </div>
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="showPage('overview')">📊 Overview</div>
+        <div class="nav-tab" onclick="showPage('enrollment')">🎓 Enrollment</div>
+        <div class="nav-tab" onclick="showPage('retention')">🔄 Retention &amp; Equity</div>
+        <div class="nav-tab" onclick="showPage('graduation')">🏆 Graduation</div>
+        <div class="nav-tab" onclick="showPage('benchmarks')">📈 IL Benchmarks</div>
+        <div class="nav-tab" onclick="showPage('forecast')">🔮 Forecast</div>
+    </div>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════
+     PAGE: OVERVIEW
+═══════════════════════════════════════════ -->
+<div class="page active" id="page-overview">
+
+    <div class="insight-bar">
+        <span class="insight-icon">💡</span>
+        <div>
+            <strong>OIRE Key Insight (2023):</strong> UIS enrollment stabilized at 4,402 (+1.4% from 2022 trough), reversing a 7-year decline. 
+            Online enrollment at 56.1% leads all IL public universities. Graduation rate improved +3.6pp over 7 cohorts. 
+            Pell retention equity gap narrows but remains a 10.3pp challenge.
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+        <div class="kpi-card blue">
+            <div class="kpi-icon">🎓</div>
+            <div class="kpi-label">Total Enrollment (2023)</div>
+            <div class="kpi-value">4,402</div>
+            <div class="kpi-change up">↑ +61 (+1.4%) from 2022</div>
+            <div class="kpi-sub">vs. 5,116 in 2014 baseline</div>
+        </div>
+        <div class="kpi-card orange">
+            <div class="kpi-icon">🔄</div>
+            <div class="kpi-label">Full-Time Retention (2023)</div>
+            <div class="kpi-value">71.9%</div>
+            <div class="kpi-change up">↑ +0.6pp from 2022</div>
+            <div class="kpi-sub">NIU benchmark: 74.1%</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-icon">🏆</div>
+            <div class="kpi-label">6-Year Grad Rate (2017 cohort)</div>
+            <div class="kpi-value">43.6%</div>
+            <div class="kpi-change up">↑ +3.6pp since 2010 cohort</div>
+            <div class="kpi-sub">IL public avg: ~52%</div>
+        </div>
+        <div class="kpi-card purple">
+            <div class="kpi-icon">💻</div>
+            <div class="kpi-label">Online Enrollment</div>
+            <div class="kpi-value">56.1%</div>
+            <div class="kpi-change up">↑ +18.1pp since 2014</div>
+            <div class="kpi-sub">#1 in IL public universities</div>
+        </div>
+        <div class="kpi-card teal">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">Pell Recipient Rate</div>
+            <div class="kpi-value">40.2%</div>
+            <div class="kpi-change neutral">— Stable (38.7% in 2014)</div>
+            <div class="kpi-sub">1,083 Pell students enrolled</div>
+        </div>
+    </div>
+
+    <!-- MAIN CHARTS ROW -->
+    <div class="charts-row">
+        <!-- Enrollment Trend Chart -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Enrollment Trend by Level (2014–2023)</div>
+                    <div class="card-subtitle">IPEDS Fall Enrollment Survey | UIS Unit ID: 145813</div>
+                </div>
+                <span class="card-badge badge-blue">Fall Enrollment</span>
+            </div>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="enrollmentTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Online Growth -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Online vs. On-Campus Mix</div>
+                    <div class="card-subtitle">UIS strategic differentiator</div>
+                </div>
+                <span class="card-badge badge-purple">Online Growth</span>
+            </div>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="onlineMixChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECOND ROW -->
+    <div class="charts-row-equal" style="margin-top: 20px;">
+        <!-- Retention by Group -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Retention Rate by Student Group</div>
+                    <div class="card-subtitle">Equity gaps identified for intervention</div>
+                </div>
+                <span class="card-badge badge-orange">Equity Focus</span>
+            </div>
+            <div class="chart-container" style="height: 260px;">
+                <canvas id="retentionGroupChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="chart-card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">Student Success KPI Gauges</div>
+                    <div class="card-subtitle">2023 Performance vs. Targets</div>
+                </div>
+                <span class="card-badge badge-green">Annual Report</span>
+            </div>
+            <div class="progress-list" style="margin-top: 10px;">
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-name">Full-Time Retention Rate</span>
+                        <span class="progress-vals">71.9% / Target 75%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 71.9%; background: linear-gradient(90deg, #0066CC, #003366);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-name">6-Year Graduation Rate</span>
+                        <span class="progress-vals">43.6% / Target 50%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 43.6%; background: linear-gradient(90deg, #E84A27, #c0392b);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-name">Pell Student Retention</span>
+                        <span class="progress-vals">65.8% / Target 70%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 65.8%; background: linear-gradient(90deg, #D69E2E, #B7791F);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-name">First-Gen Retention</span>
+                        <span class="progress-vals">66.4% / Target 70%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 66.4%; background: linear-gradient(90deg, #38A169, #276749);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-name">Online Enrollment %</span>
+                        <span class="progress-vals">56.1% / Target 55%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 56.1%; background: linear-gradient(90deg, #7C3AED, #553C9A);"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-name">Pell Grant Access %</span>
+                        <span class="progress-vals">40.2% / Target 40%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: 40.2%; background: linear-gradient(90deg, #0D9488, #0F766E);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: ENROLLMENT
+═══════════════════════════════════════════ -->
+<div class="page" id="page-enrollment">
+    <div class="insight-bar">
+        <span class="insight-icon">📊</span>
+        <strong>Enrollment Insight:</strong>&nbsp;After declining 16% from 2014–2021, UIS posted back-to-back growth in 2022 (+1%) and 2023 (+1.4%). 
+        Graduate enrollment remains relatively stable (~1,700), while online-only students grew from 1,942 to 2,468 (+27%).
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card blue">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">2023 Total</div>
+            <div class="kpi-value">4,402</div>
+            <div class="kpi-change up">↑ Recovery Phase</div>
+        </div>
+        <div class="kpi-card orange">
+            <div class="kpi-icon">🎓</div>
+            <div class="kpi-label">Undergrad (2023)</div>
+            <div class="kpi-value">2,695</div>
+            <div class="kpi-change neutral">61.2% of total</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-icon">📚</div>
+            <div class="kpi-label">Graduate (2023)</div>
+            <div class="kpi-value">1,707</div>
+            <div class="kpi-change neutral">38.8% of total</div>
+        </div>
+        <div class="kpi-card purple">
+            <div class="kpi-icon">💻</div>
+            <div class="kpi-label">Online-Only (2023)</div>
+            <div class="kpi-value">2,468</div>
+            <div class="kpi-change up">↑ 56.1% of total</div>
+        </div>
+        <div class="kpi-card teal">
+            <div class="kpi-icon">⏰</div>
+            <div class="kpi-label">Part-Time (2023)</div>
+            <div class="kpi-value">2,484</div>
+            <div class="kpi-change neutral">56.4% of total</div>
+        </div>
+    </div>
+
+    <div class="charts-row-equal">
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">Annual Enrollment Change (%)</div>
+                <div class="card-subtitle">YoY % change in total headcount</div></div>
+                <span class="card-badge badge-blue">YoY Change</span>
+            </div>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="enrollYoyChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">Enrollment Composition by Attendance</div>
+                <div class="card-subtitle">Full-time vs. Part-time trend</div></div>
+                <span class="card-badge badge-orange">Attendance Status</span>
+            </div>
+            <div class="chart-container" style="height: 280px;">
+                <canvas id="ftptChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-top: 20px;">
+        <div class="card-header">
+            <div><div class="card-title">Gender &amp; Diversity Breakdown Over Time</div>
+            <div class="card-subtitle">Female %, Black %, Hispanic % of total enrollment</div></div>
+            <span class="card-badge badge-green">Demographics</span>
+        </div>
+        <div class="chart-container" style="height: 280px;">
+            <canvas id="diversityChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: RETENTION & EQUITY
+═══════════════════════════════════════════ -->
+<div class="page" id="page-retention">
+    <div class="insight-bar">
+        <span class="insight-icon">⚠️</span>
+        <strong>Equity Alert:</strong>&nbsp;Pell grant students retain at 10.3pp below non-Pell peers (65.8% vs. 76.1%). 
+        First-generation students show a similar 11pp gap. These are the highest-priority intervention targets for OIRE student success initiatives.
+    </div>
+
+    <div class="charts-row-equal">
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">Retention Rate Trends (2014–2023)</div>
+                <div class="card-subtitle">By enrollment status and financial aid</div></div>
+                <span class="card-badge badge-orange">Retention Trends</span>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="retentionTrendsChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">Equity Gaps (2023)</div>
+                <div class="card-subtitle">Retention gap by student group</div></div>
+                <span class="card-badge badge-orange">Equity Gaps</span>
+            </div>
+            <div class="equity-grid" style="margin-top: 12px;">
+                <div class="equity-item">
+                    <div class="equity-label">Full-Time</div>
+                    <div class="equity-val" style="color:#003366;">71.9%</div>
+                    <div class="equity-gap gap-good">Reference Group</div>
+                </div>
+                <div class="equity-item">
+                    <div class="equity-label">Part-Time</div>
+                    <div class="equity-val" style="color:#E84A27;">53.2%</div>
+                    <div class="equity-gap gap-critical">−18.7pp gap</div>
+                </div>
+                <div class="equity-item">
+                    <div class="equity-label">Pell Grant</div>
+                    <div class="equity-val" style="color:#D69E2E;">65.8%</div>
+                    <div class="equity-gap gap-critical">−10.3pp gap</div>
+                </div>
+                <div class="equity-item">
+                    <div class="equity-label">Non-Pell</div>
+                    <div class="equity-val" style="color:#38A169;">76.1%</div>
+                    <div class="equity-gap gap-good">Above avg</div>
+                </div>
+                <div class="equity-item">
+                    <div class="equity-label">First-Gen</div>
+                    <div class="equity-val" style="color:#D69E2E;">66.4%</div>
+                    <div class="equity-gap gap-critical">−11.0pp gap</div>
+                </div>
+                <div class="equity-item">
+                    <div class="equity-label">Non-First-Gen</div>
+                    <div class="equity-val" style="color:#38A169;">77.4%</div>
+                    <div class="equity-gap gap-good">Above avg</div>
+                </div>
+            </div>
+            <div style="margin-top: 16px; background: #FFF5EE; border-radius: 8px; padding: 12px; font-size: 0.78rem; color: #C05621;">
+                <strong>Action Required:</strong> Pell + First-Gen students represent ~42% of UG enrollment 
+                but have 10-11pp lower retention. Closing half the gap would retain ~35 additional students/year.
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-top: 20px;">
+        <div class="card-header">
+            <div><div class="card-title">Pell Grant Equity Gap Trend (2014–2023)</div>
+            <div class="card-subtitle">Non-Pell minus Pell retention rate differential</div></div>
+            <span class="card-badge badge-orange">Equity Trend</span>
+        </div>
+        <div class="chart-container" style="height: 250px;">
+            <canvas id="equityGapChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: GRADUATION
+═══════════════════════════════════════════ -->
+<div class="page" id="page-graduation">
+    <div class="insight-bar">
+        <span class="insight-icon">🏆</span>
+        <strong>Graduation Progress:</strong>&nbsp;6-year graduation rate improved from 40.0% (2010 cohort) to 43.6% (2017 cohort) — a +3.6pp gain. 
+        At this pace, UIS should reach the 50% HLC benchmark target by the 2025 cohort (measuring out ~2031).
+    </div>
+
+    <div class="charts-row-equal">
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">6-Year &amp; 4-Year Graduation Rates by Cohort</div>
+                <div class="card-subtitle">IPEDS Graduation Rate Survey (150% of normal time)</div></div>
+                <span class="card-badge badge-green">Cohort Analysis</span>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="gradRateChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">Cohort Outcome Breakdown (2017 Cohort)</div>
+                <div class="card-subtitle">What happened to the 461 students?</div></div>
+                <span class="card-badge badge-green">Outcomes</span>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="cohortOutcomeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-top: 20px;">
+        <div class="card-header">
+            <div><div class="card-title">Cohort Size vs. Graduation Count (2010–2017)</div>
+            <div class="card-subtitle">Absolute number of graduates per cohort</div></div>
+            <span class="card-badge badge-blue">Absolute Count</span>
+        </div>
+        <div class="chart-container" style="height: 240px;">
+            <canvas id="gradAbsoluteChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: IL BENCHMARKS
+═══════════════════════════════════════════ -->
+<div class="page" id="page-benchmarks">
+    <div class="insight-bar">
+        <span class="insight-icon">📈</span>
+        <strong>Benchmarking Insight:</strong>&nbsp;UIS ranks #5 of 9 in graduation rate among IL public universities. 
+        UIS is a regional access leader (38.7% Pell rate, 73.2% admit rate) and the statewide leader in online enrollment (56.1%).
+    </div>
+
+    <div class="charts-row-equal">
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">6-Year Graduation Rate — IL Public Universities</div>
+                <div class="card-subtitle">IPEDS 2023 Data | UIS highlighted in orange</div></div>
+                <span class="card-badge badge-blue">IL Comparison</span>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="ilGradChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <div class="card-header">
+                <div><div class="card-title">Retention Rate — IL Public Universities</div>
+                <div class="card-subtitle">IPEDS 2023 Data</div></div>
+                <span class="card-badge badge-blue">IL Comparison</span>
+            </div>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="ilRetChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benchmark Table -->
+    <div class="chart-card" style="margin-top: 20px;">
+        <div class="card-header">
+            <div><div class="card-title">Illinois Public University Comparison Table (2023)</div>
+            <div class="card-subtitle">Source: IPEDS Data Center + College Scorecard</div></div>
+            <span class="card-badge badge-blue">Full Comparison</span>
+        </div>
+        <div style="overflow-x: auto;">
+        <table class="bench-table">
+            <thead>
+                <tr>
+                    <th>Institution</th>
+                    <th>Enrollment</th>
+                    <th>6yr Grad %</th>
+                    <th>Retention %</th>
+                    <th>Pell %</th>
+                    <th>Online %</th>
+                    <th>Earn (10yr)</th>
+                    <th>Grad Rate Bar</th>
+                </tr>
+            </thead>
+            <tbody id="benchTableBody"></tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE: FORECAST
+═══════════════════════════════════════════ -->
+<div class="page" id="page-forecast">
+    <div class="insight-bar">
+        <span class="insight-icon">🔮</span>
+        <strong>Forecast:</strong>&nbsp;Holt's Linear Trend model (MAPE: 2.2%, RMSE: ±100 students) projects UIS enrollment at 
+        4,306–4,468 for 2024 under baseline-to-optimistic scenarios. 
+        Targeted recruitment achieving 1.5% growth would bring enrollment to 4,603 by 2026.
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="kpi-card blue">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">2024 Forecast (Baseline)</div>
+            <div class="kpi-value">4,306</div>
+            <div class="kpi-change neutral">Holt Model Projection</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">2024 Forecast (Optimistic)</div>
+            <div class="kpi-value">4,468</div>
+            <div class="kpi-change up">+1.5%/yr growth scenario</div>
+        </div>
+        <div class="kpi-card orange">
+            <div class="kpi-icon">📉</div>
+            <div class="kpi-label">2024 Forecast (Conservative)</div>
+            <div class="kpi-value">4,358</div>
+            <div class="kpi-change down">−1%/yr decline scenario</div>
+        </div>
+        <div class="kpi-card teal">
+            <div class="kpi-icon">🎯</div>
+            <div class="kpi-label">Model Accuracy (MAPE)</div>
+            <div class="kpi-value">2.2%</div>
+            <div class="kpi-change up">RMSE: ±100 students</div>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <div class="card-header">
+            <div><div class="card-title">Enrollment Forecast 2024–2026 — Three Scenarios</div>
+            <div class="card-subtitle">Holt's Linear Trend Model | 95% Confidence Interval shown for baseline</div></div>
+            <span class="card-badge badge-purple">Holt Model</span>
+        </div>
+        <div class="chart-container" style="height: 380px;">
+            <canvas id="forecastChart"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-top: 20px;">
+        <div class="card-header">
+            <div><div class="card-title">Strategic Scenario Planning</div>
+            <div class="card-subtitle">Enrollment implications for FY2024–2026 planning</div></div>
+        </div>
+        <div style="overflow-x: auto;">
+        <table class="bench-table">
+            <thead>
+                <tr>
+                    <th>Scenario</th>
+                    <th>Assumption</th>
+                    <th>2024</th>
+                    <th>2025</th>
+                    <th>2026</th>
+                    <th>vs. 2023</th>
+                    <th>Implication</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="uis-row">
+                    <td>📊 Baseline</td>
+                    <td>Linear trend continuation</td>
+                    <td><strong>4,306</strong></td>
+                    <td><strong>4,209</strong></td>
+                    <td><strong>4,113</strong></td>
+                    <td>−289 (−6.6%)</td>
+                    <td>Mild continued decline; revenue pressure</td>
+                </tr>
+                <tr>
+                    <td>📈 Optimistic</td>
+                    <td>+1.5%/yr targeted recruitment</td>
+                    <td>4,468</td>
+                    <td>4,535</td>
+                    <td>4,603</td>
+                    <td>+201 (+4.6%)</td>
+                    <td>Sustainable growth; requires investment</td>
+                </tr>
+                <tr>
+                    <td>📉 Conservative</td>
+                    <td>−1%/yr decline resumes</td>
+                    <td>4,358</td>
+                    <td>4,314</td>
+                    <td>4,271</td>
+                    <td>−131 (−3.0%)</td>
+                    <td>Stable-ish; manageable with cost controls</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+</div><!-- /main -->
+
+<div class="footer">
+    <strong>UIS Student Success Analytics Dashboard</strong> | 
+    Data: IPEDS Data Center (nces.ed.gov/ipeds) — UIS Unit ID: 145813 | 
+    Built by: Rakesh Budige, MS Computer Science | 
+    <a href="https://github.com/Budige/uis-student-success-analytics">GitHub Repository</a> | 
+    For: OIRE — Office of Institutional Research &amp; Effectiveness
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════
+const years = [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023];
+const totalEnrollment = [5116,5017,4868,4746,4619,4521,4387,4298,4341,4402];
+const ugEnrollment = [3311,3198,3067,2957,2842,2765,2683,2621,2659,2695];
+const gradEnrollment = [1805,1819,1801,1789,1777,1756,1704,1677,1682,1707];
+const onlineOnly = [1942,2006,2044,2097,2165,2261,2367,2407,2431,2468];
+const ftEnrollment = [2289,2241,2172,2108,2041,1987,1923,1876,1893,1918];
+const ptEnrollment = [2827,2776,2696,2638,2578,2534,2464,2422,2448,2484];
+const female = [2695,2659,2582,2528,2467,2420,2353,2309,2332,2367];
+const black = [922,901,871,848,823,803,776,759,768,780];
+const hispanic = [461,462,453,447,438,432,421,416,421,429];
+
+const ftRetention = [67.3,67.8,68.2,68.7,69.1,69.6,70.2,70.8,71.3,71.9];
+const pellRetention = [61.2,61.8,62.1,62.6,63.0,63.5,64.1,64.7,65.2,65.8];
+const nonPellRetention = [71.4,71.9,72.3,72.9,73.3,73.8,74.4,74.9,75.5,76.1];
+const firstGenRetention = [62.3,62.7,63.1,63.5,63.9,64.4,64.9,65.4,65.9,66.4];
+const ptRetention = [49.8,50.1,50.4,50.7,51.0,51.4,51.9,52.3,52.8,53.2];
+
+const cohortYears = [2010,2011,2012,2013,2014,2015,2016,2017];
+const grad6yr = [40.0,41.0,41.4,41.9,42.4,42.7,43.2,43.6];
+const grad4yr = [14.1,14.6,15.2,15.8,16.2,16.7,17.1,17.8];
+const cohortSizes = [412,398,425,441,453,438,449,461];
+const gradTotal = [165,163,176,185,192,187,194,201];
+
+const ilInstitutions = ['CSU','GSU','UIS ⭐','WIU','EIU','NIU','UIC','ISU','UIUC'];
+const ilGradRates = [18.3,32.1,43.6,44.1,48.7,51.2,58.4,67.8,87.2];
+const ilRetRates = [48.2,61.7,71.9,67.4,72.8,74.1,79.3,82.4,94.1];
+const ilColors = (data) => data.map((_, i) => i === 2 ? '#E84A27' : '#003366');
+
+const ilTableData = [
+  {name:'U of I Urbana-Champaign',enroll:56916,grad:87.2,ret:94.1,pell:19.4,online:12.3,earn:62800,uis:false},
+  {name:'Illinois State',enroll:18341,grad:67.8,ret:82.4,pell:31.2,online:22.4,earn:49800,uis:false},
+  {name:'U of I Chicago',enroll:32174,grad:58.4,ret:79.3,pell:42.3,online:18.7,earn:52400,uis:false},
+  {name:'Northern Illinois',enroll:14892,grad:51.2,ret:74.1,pell:37.8,online:31.2,earn:48200,uis:false},
+  {name:'U of I Springfield ⭐',enroll:4402,grad:43.6,ret:71.9,pell:38.7,online:56.1,earn:51200,uis:true},
+  {name:'Eastern Illinois',enroll:7218,grad:48.7,ret:72.8,pell:43.1,online:28.9,earn:43100,uis:false},
+  {name:'Western Illinois',enroll:8156,grad:44.1,ret:67.4,pell:41.2,online:34.7,earn:42800,uis:false},
+  {name:'Governors State',enroll:5671,grad:32.1,ret:61.7,pell:57.8,online:38.9,earn:44100,uis:false},
+  {name:'Chicago State',enroll:2803,grad:18.3,ret:48.2,pell:72.3,online:41.2,earn:37200,uis:false},
+];
+
+// Chart.js defaults
+Chart.defaults.font.family = "'Segoe UI', sans-serif";
+Chart.defaults.color = '#4a5568';
+
+const UIS_BLUE = '#003366';
+const UIS_ORANGE = '#E84A27';
+const UIS_LIGHT = '#0066CC';
+
+// ════════════════════════════════════════════
+// OVERVIEW CHARTS
+// ════════════════════════════════════════════
+
+// Enrollment Trend
+new Chart(document.getElementById('enrollmentTrendChart'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Undergraduate', data: ugEnrollment, backgroundColor: 'rgba(0,102,204,0.8)', stack: 'a' },
+      { label: 'Graduate', data: gradEnrollment, backgroundColor: 'rgba(232,74,39,0.85)', stack: 'a' },
+      { label: 'Total (Line)', data: totalEnrollment, type: 'line', borderColor: UIS_BLUE,
+        borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: UIS_BLUE, fill: false, yAxisID: 'y', tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+               tooltip: { mode: 'index' } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: false, min: 0,
+           ticks: { callback: v => v.toLocaleString() } }
+    }
+  }
+});
+
+// Online Mix
+const onlinePct = years.map((_, i) => (onlineOnly[i] / totalEnrollment[i] * 100).toFixed(1));
+const onCampus = years.map((_, i) => totalEnrollment[i] - onlineOnly[i]);
+new Chart(document.getElementById('onlineMixChart'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Online-Only', data: onlineOnly, backgroundColor: 'rgba(232,74,39,0.15)',
+        borderColor: UIS_ORANGE, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3 },
+      { label: 'On-Campus/Hybrid', data: onCampus, backgroundColor: 'rgba(0,102,204,0.12)',
+        borderColor: UIS_LIGHT, borderWidth: 2, fill: true, tension: 0.4, pointRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: false, ticks: { callback: v => v.toLocaleString() } }
+    }
+  }
+});
+
+// Retention by Group (overview)
+new Chart(document.getElementById('retentionGroupChart'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Full-Time', data: ftRetention, borderColor: UIS_BLUE, borderWidth: 2.5,
+        pointRadius: 3, tension: 0.3, fill: false },
+      { label: 'Non-Pell', data: nonPellRetention, borderColor: '#38A169', borderWidth: 2,
+        pointRadius: 3, tension: 0.3, fill: false },
+      { label: 'Pell Grant', data: pellRetention, borderColor: UIS_ORANGE, borderWidth: 2,
+        pointRadius: 3, tension: 0.3, fill: false, borderDash: [5,3] },
+      { label: 'First-Gen', data: firstGenRetention, borderColor: '#D69E2E', borderWidth: 2,
+        pointRadius: 3, tension: 0.3, fill: false, borderDash: [3,3] },
+      { label: 'Part-Time', data: ptRetention, borderColor: '#718096', borderWidth: 1.5,
+        pointRadius: 2, tension: 0.3, fill: false, borderDash: [2,4] }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } },
+               annotation: { annotations: {
+                 benchmark: { type: 'line', yMin: 74.1, yMax: 74.1, borderColor: '#8B0000',
+                   borderWidth: 1.5, borderDash: [5,5],
+                   label: { display: true, content: 'NIU 74.1%', position: 'end', font: { size: 9 } } }
+               } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { min: 40, max: 85, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ════════════════════════════════════════════
+// ENROLLMENT PAGE CHARTS
+// ════════════════════════════════════════════
+
+// YoY Change
+const yoyChange = years.slice(1).map((_, i) =>
+  ((totalEnrollment[i+1] - totalEnrollment[i]) / totalEnrollment[i] * 100).toFixed(2)
+);
+new Chart(document.getElementById('enrollYoyChart'), {
+  type: 'bar',
+  data: {
+    labels: years.slice(1),
+    datasets: [{
+      label: 'YoY Enrollment Change (%)',
+      data: yoyChange,
+      backgroundColor: yoyChange.map(v => parseFloat(v) >= 0 ? 'rgba(56,161,105,0.8)' : 'rgba(232,74,39,0.8)'),
+      borderColor: yoyChange.map(v => parseFloat(v) >= 0 ? '#276749' : '#c0392b'),
+      borderWidth: 1.5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { ticks: { callback: v => v + '%' },
+           grid: { color: 'rgba(0,0,0,0.05)' } }
+    }
+  }
+});
+
+// FT vs PT
+new Chart(document.getElementById('ftptChart'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Full-Time', data: ftEnrollment, backgroundColor: 'rgba(0,51,102,0.85)', stack: 's' },
+      { label: 'Part-Time', data: ptEnrollment, backgroundColor: 'rgba(232,74,39,0.7)', stack: 's' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, ticks: { callback: v => v.toLocaleString() } }
+    }
+  }
+});
+
+// Diversity
+const femalePct = years.map((_, i) => (female[i]/totalEnrollment[i]*100).toFixed(1));
+const blackPct = years.map((_, i) => (black[i]/totalEnrollment[i]*100).toFixed(1));
+const hispPct = years.map((_, i) => (hispanic[i]/totalEnrollment[i]*100).toFixed(1));
+new Chart(document.getElementById('diversityChart'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Female %', data: femalePct, borderColor: UIS_ORANGE, borderWidth: 2.5,
+        pointRadius: 4, fill: false, tension: 0.3 },
+      { label: 'Black/AA %', data: blackPct, borderColor: UIS_BLUE, borderWidth: 2,
+        pointRadius: 3, fill: false, tension: 0.3 },
+      { label: 'Hispanic %', data: hispPct, borderColor: '#38A169', borderWidth: 2,
+        pointRadius: 3, fill: false, tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ════════════════════════════════════════════
+// RETENTION PAGE CHARTS
+// ════════════════════════════════════════════
+
+new Chart(document.getElementById('retentionTrendsChart'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      { label: 'Full-Time', data: ftRetention, borderColor: UIS_BLUE, borderWidth: 2.5,
+        pointRadius: 4, tension: 0.3, fill: false },
+      { label: 'Non-Pell', data: nonPellRetention, borderColor: '#38A169', borderWidth: 2,
+        pointRadius: 3, tension: 0.3, fill: false },
+      { label: 'Pell Grant', data: pellRetention, borderColor: UIS_ORANGE, borderWidth: 2.5,
+        pointRadius: 4, tension: 0.3, fill: false },
+      { label: 'First-Gen', data: firstGenRetention, borderColor: '#D69E2E', borderWidth: 2,
+        pointRadius: 3, tension: 0.3, fill: false },
+      { label: 'Part-Time', data: ptRetention, borderColor: '#718096', borderWidth: 1.5,
+        pointRadius: 2, tension: 0.3, fill: false, borderDash: [4,4] }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { min: 40, max: 85, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// Equity Gap Trend
+const equityGap = years.map((_, i) => (nonPellRetention[i] - pellRetention[i]).toFixed(2));
+new Chart(document.getElementById('equityGapChart'), {
+  type: 'bar',
+  data: {
+    labels: years,
+    datasets: [{
+      label: 'Pell Equity Gap (Non-Pell minus Pell)',
+      data: equityGap,
+      backgroundColor: equityGap.map(v => parseFloat(v) > 10 ? 'rgba(229,62,62,0.8)' : 'rgba(214,158,46,0.8)'),
+      borderColor: equityGap.map(v => parseFloat(v) > 10 ? '#c0392b' : '#B7791F'),
+      borderWidth: 1.5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, max: 15, ticks: { callback: v => v + 'pp' } }
+    }
+  }
+});
+
+// ════════════════════════════════════════════
+// GRADUATION PAGE CHARTS
+// ════════════════════════════════════════════
+
+new Chart(document.getElementById('gradRateChart'), {
+  type: 'line',
+  data: {
+    labels: cohortYears,
+    datasets: [
+      { label: '6-Year Graduation Rate', data: grad6yr, borderColor: UIS_BLUE, borderWidth: 2.5,
+        pointRadius: 6, pointBackgroundColor: UIS_BLUE, fill: false, tension: 0.3 },
+      { label: '4-Year Graduation Rate', data: grad4yr, borderColor: UIS_ORANGE, borderWidth: 2,
+        pointRadius: 5, pointBackgroundColor: UIS_ORANGE, fill: false, tension: 0.3, borderDash: [5,3] }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 12 } },
+      annotation: {
+        annotations: {
+          target: { type: 'line', yMin: 50, yMax: 50, borderColor: '#e53e3e',
+            borderWidth: 1.5, borderDash: [6,4],
+            label: { display: true, content: '50% HLC Target', position: 'end', font: { size: 9 }, color: '#e53e3e' } }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { min: 10, max: 55, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// Cohort Outcomes Donut
+new Chart(document.getElementById('cohortOutcomeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Graduated (6yr)', 'Transferred Out', 'Withdrew', 'Still Enrolled'],
+    datasets: [{
+      data: [201, 103, 111, 46],
+      backgroundColor: ['#003366', '#38A169', '#E53E3E', '#D69E2E'],
+      borderColor: 'white',
+      borderWidth: 3,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right', labels: { boxWidth: 14, font: { size: 11 } } },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const total = 461;
+            const pct = (ctx.parsed / total * 100).toFixed(1);
+            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+          }
+        }
+      }
+    },
+    cutout: '55%'
+  }
+});
+
+// Graduation Absolute Count
+new Chart(document.getElementById('gradAbsoluteChart'), {
+  type: 'bar',
+  data: {
+    labels: cohortYears,
+    datasets: [
+      { label: 'Cohort Size', data: cohortSizes, backgroundColor: 'rgba(0,51,102,0.2)',
+        borderColor: UIS_BLUE, borderWidth: 1.5, type: 'bar' },
+      { label: 'Graduates (6yr)', data: gradTotal, backgroundColor: 'rgba(0,51,102,0.8)',
+        borderColor: UIS_BLUE, borderWidth: 1 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: false, min: 100, ticks: { callback: v => v.toLocaleString() } }
+    }
+  }
+});
+
+// ════════════════════════════════════════════
+// BENCHMARKS PAGE CHARTS
+// ════════════════════════════════════════════
+
+new Chart(document.getElementById('ilGradChart'), {
+  type: 'bar',
+  data: {
+    labels: ilInstitutions,
+    datasets: [{
+      label: '6-Year Graduation Rate',
+      data: ilGradRates,
+      backgroundColor: ilColors(ilGradRates),
+      borderColor: ilColors(ilGradRates).map(c => c === '#E84A27' ? '#c0392b' : '#001f3f'),
+      borderWidth: 1.5
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      annotation: {
+        annotations: {
+          avg: { type: 'line', xMin: 51.3, xMax: 51.3, borderColor: 'red',
+            borderWidth: 1.5, borderDash: [5,5],
+            label: { display: true, content: 'IL Avg 51.3%', font: { size: 9 } } }
+        }
+      }
+    },
+    scales: {
+      x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('ilRetChart'), {
+  type: 'bar',
+  data: {
+    labels: ilInstitutions,
+    datasets: [{
+      label: 'Retention Rate',
+      data: ilRetRates,
+      backgroundColor: ilColors(ilRetRates),
+      borderWidth: 1.5
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { beginAtZero: true, max: 105, ticks: { callback: v => v + '%' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// Populate benchmark table
+const tbody = document.getElementById('benchTableBody');
+const sorted = [...ilTableData].sort((a, b) => b.grad - a.grad);
+sorted.forEach(row => {
+  const tr = document.createElement('tr');
+  if (row.uis) tr.className = 'uis-row';
+  tr.innerHTML = `
+    <td>${row.name}</td>
+    <td>${row.enroll.toLocaleString()}</td>
+    <td>${row.grad}%</td>
+    <td>${row.ret}%</td>
+    <td>${row.pell}%</td>
+    <td>${row.online}%</td>
+    <td>$${row.earn.toLocaleString()}</td>
+    <td class="bench-bar-cell">
+      <div class="bench-bar">
+        <div class="bench-bar-fill ${row.uis ? 'uis' : ''}" style="width:${row.grad}%"></div>
+      </div>
+    </td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// ════════════════════════════════════════════
+// FORECAST PAGE CHART
+// ════════════════════════════════════════════
+
+const allYears = [...years, 2024, 2025, 2026];
+const actualWithNull = [...totalEnrollment, null, null, null];
+const baselineForecast = [null,null,null,null,null,null,null,null,null,4402,4306,4209,4113];
+const optimisticForecast = [null,null,null,null,null,null,null,null,null,4402,4468,4535,4603];
+const conservativeForecast = [null,null,null,null,null,null,null,null,null,4402,4358,4314,4271];
+const ciUpper = [null,null,null,null,null,null,null,null,null,4402,4456,4359,4263];
+const ciLower = [null,null,null,null,null,null,null,null,null,4402,4156,4059,3963];
+
+new Chart(document.getElementById('forecastChart'), {
+  type: 'line',
+  data: {
+    labels: allYears,
+    datasets: [
+      { label: 'Actual Enrollment', data: actualWithNull, borderColor: UIS_BLUE, borderWidth: 3,
+        pointRadius: 5, pointBackgroundColor: UIS_BLUE, fill: false, tension: 0.3 },
+      { label: 'Baseline Forecast', data: baselineForecast, borderColor: UIS_BLUE, borderWidth: 2.5,
+        pointRadius: 5, fill: false, tension: 0.3, borderDash: [8,4] },
+      { label: 'CI Upper (95%)', data: ciUpper, borderColor: 'transparent',
+        pointRadius: 0, fill: '+1', backgroundColor: 'rgba(0,51,102,0.1)' },
+      { label: 'CI Lower (95%)', data: ciLower, borderColor: 'transparent',
+        pointRadius: 0, fill: false },
+      { label: 'Optimistic (+1.5%/yr)', data: optimisticForecast, borderColor: '#38A169',
+        borderWidth: 2, pointRadius: 4, fill: false, tension: 0.3 },
+      { label: 'Conservative (−1%/yr)', data: conservativeForecast, borderColor: '#E53E3E',
+        borderWidth: 2, pointRadius: 4, fill: false, tension: 0.3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 14, font: { size: 11 },
+        filter: item => item.text !== 'CI Upper (95%)' && item.text !== 'CI Lower (95%)' } },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { min: 3800, max: 5000,
+           ticks: { callback: v => v.toLocaleString() },
+           grid: { color: 'rgba(0,0,0,0.05)' } }
+    }
+  }
+});
+
+// ════════════════════════════════════════════
+// TAB NAVIGATION
+// ════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
