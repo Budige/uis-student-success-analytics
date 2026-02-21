@@ -3,6 +3,7 @@
 -- Purpose: Track UIS enrollment decline and stabilization
 -- Relevant to: OIRE Strategic Planning, IBHE Reporting
 -- Author: Rakesh Budige
+-- Contact: rbudige@uis.edu
 -- ============================================================
 
 WITH enrollment_with_lag AS (
