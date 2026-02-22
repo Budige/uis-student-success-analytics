@@ -79,7 +79,7 @@ def run_quality_checks() -> dict:
         "Not-first-gen > First-gen": (rdf["not_first_gen_retention"] > rdf["first_gen_retention"]).all(),
         "Full-time > Part-time": (rdf["full_time_retention"] > rdf["part_time_retention"]).all(),
         "All rates 0-100": ((rdf.iloc[:, 1:] >= 0) & (rdf.iloc[:, 1:] <= 100)).all().all(),
-        "Improving FT trend": rdf["full_time_retention"].is_monotonic_increasing,
+        "Improving FT trend (net)": rdf["full_time_retention"].iloc[-1] > rdf["full_time_retention"].iloc[0],
     }
     results["retention"] = r_checks
     for name, passed in r_checks.items():

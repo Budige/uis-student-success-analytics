@@ -6,8 +6,8 @@
 [![Data Source: IPEDS](https://img.shields.io/badge/Data-IPEDS%20(NCES)-blue)](https://nces.ed.gov/ipeds/)
 [![UIS Unit ID](https://img.shields.io/badge/UIS%20Unit%20ID-145813-orange)](https://nces.ed.gov/ipeds/datacenter/InstitutionProfile.aspx?unitId=145813)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://python.org)
-[![Tests: 19/19](https://img.shields.io/badge/Tests-19%2F19%20Passing-brightgreen)](#)
-[![Data Quality: 29/29](https://img.shields.io/badge/Data%20Quality-29%2F29%20Checks-brightgreen)](#)
+[![Tests: 19/19](https://img.shields.io/badge/Tests-19%2F19%20Passing-brightgreen)](tests/test_data_quality.py)
+[![Data Quality: 29/29](https://img.shields.io/badge/Data%20Quality-29%2F29%20Checks-brightgreen)](python/analysis/data_quality_report.py)
 
 ---
 
