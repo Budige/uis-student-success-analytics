@@ -1,0 +1,6 @@
+year,total_enrollment,enrollment_yoy_change,enrollment_yoy_pct,undergrad_enrollment,grad_enrollment,full_time_pct,online_pct,full_time_retention,pell_retention,first_gen_retention,retention_yoy_change,pell_recipients,pell_pct_undergrad,avg_net_price_0_30k,any_aid_pct,female_pct,black_hispanic_pct,enrollment_status,retention_status
+2019,4521,-98.0,-2.12,2765,1756,44.0,50.0,69.6,63.5,64.4,0.5,1123,40.6,11980,89.8,53.5,27.3,Declining,Monitor
+2020,4387,-134.0,-2.96,2683,1704,43.8,54.0,70.2,64.1,64.9,0.6,1097,40.9,12150,89.4,53.6,27.3,Declining,Monitor
+2021,4298,-89.0,-2.03,2621,1677,43.6,56.0,70.8,64.7,65.4,0.6,1075,41.0,12320,89.1,53.7,27.3,Declining,Monitor
+2022,4341,43.0,1.0,2659,1682,43.6,56.0,71.3,65.2,65.9,0.5,1078,40.5,12490,88.7,53.7,27.4,Growing,On Track
+2023,4402,61.0,1.41,2695,1707,43.6,56.1,71.9,65.8,66.4,0.6,1083,40.2,12670,88.4,53.8,27.5,Growing,On Track

@@ -1,0 +1,10 @@
+institution,total_enrollment_2023,grad_rate_6yr,grad_rate_rank,retention_rate,retention_rank,pell_grant_pct,online_pct,median_earnings_10yr,earnings_rank,gap_to_il_avg_grad,gap_to_il_avg_retention,is_uis,peer_group
+U of I Urbana-Champaign,56916,87.2,1,94.1,1,19.4,12.3,62800,1,37.04,21.67,,Non-Peer
+Illinois State,18341,67.8,2,82.4,2,31.2,22.4,49800,4,17.64,9.97,,Non-Peer
+U of I Chicago,32174,58.4,3,79.3,3,42.3,18.7,52400,2,8.24,6.87,,Non-Peer
+Northern Illinois,14892,51.2,4,74.1,4,37.8,31.2,48200,5,1.04,1.67,,Non-Peer
+Eastern Illinois,7218,48.7,5,72.8,5,43.1,28.9,43100,7,-1.46,0.37,,Peer (3k-10k)
+Western Illinois,8156,44.1,6,67.4,7,41.2,34.7,42800,8,-6.06,-5.03,,Peer (3k-10k)
+U of I Springfield,4402,43.6,7,71.9,6,38.7,56.1,51200,3,-6.56,-0.53,UIS (Focus),Peer (3k-10k)
+Governors State,5671,32.1,8,61.7,8,57.8,38.9,44100,6,-18.06,-10.73,,Peer (3k-10k)
+Chicago State,2803,18.3,9,48.2,9,72.3,41.2,37200,9,-31.86,-24.23,,Non-Peer

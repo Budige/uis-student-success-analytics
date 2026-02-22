@@ -1,7 +1,7 @@
 institution,unitid,total_enrollment_2023,grad_rate_6yr,retention_rate,pell_grant_pct,online_pct,full_time_pct,median_earnings_10yr,admit_rate
 U of I Urbana-Champaign,145637,56916,87.2,94.1,19.4,12.3,83.4,62800,44.7
 U of I Chicago,145600,32174,58.4,79.3,42.3,18.7,62.1,52400,79.3
-U of I Springfield,145813,4402,43.6,71.9,38.7,56.1,43.6,51200,73.2
+UIS (Springfield),145813,4402,43.6,71.9,38.7,56.1,43.6,51200,73.2
 Illinois State,147703,18341,67.8,82.4,31.2,22.4,71.8,49800,68.9
 Northern Illinois,147776,14892,51.2,74.1,37.8,31.2,61.2,48200,79.1
 Eastern Illinois,149222,7218,48.7,72.8,43.1,28.9,62.4,43100,73.8

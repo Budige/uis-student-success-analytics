@@ -1,0 +1,9 @@
+cohort_year,cohort_size,grad_6yr_rate,grad_4yr_rate,completion_rate,transfer_rate,withdrawal_rate,yoy_grad_improvement,trailing_4yr_avg,vs_il_public_avg,hlc_status
+2010,412,40.0,14.1,62.62,22.57,27.43,,,-12.0,Approaching Threshold
+2011,398,41.0,14.6,63.57,22.61,26.63,1.0,,-11.0,Approaching Threshold
+2012,425,41.4,15.2,63.76,22.35,26.12,0.4,,-10.6,Approaching Threshold
+2013,441,41.9,15.8,64.4,22.45,25.62,0.5,41.08,-10.1,Approaching Threshold
+2014,453,42.4,16.2,64.68,22.3,25.39,0.5,41.68,-9.6,Approaching Threshold
+2015,438,42.7,16.7,65.07,22.37,24.89,0.3,42.1,-9.3,Approaching Threshold
+2016,449,43.2,17.1,65.48,22.27,24.5,0.5,42.55,-8.8,Approaching Threshold
+2017,461,43.6,17.8,65.94,22.34,24.08,0.4,42.98,-8.4,Approaching Threshold
