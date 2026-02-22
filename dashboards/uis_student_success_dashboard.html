@@ -1503,14 +1503,25 @@ new Chart(document.getElementById('forecastChart'), {
 });
 
 // ════════════════════════════════════════════
-// TAB NAVIGATION
+// TAB NAVIGATION — resize charts after reveal
 // ════════════════════════════════════════════
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   event.target.classList.add('active');
+  // Charts initialized on display:none render at 0px — force resize after reveal
+  setTimeout(() => {
+    Chart.instances.forEach(c => { try { c.resize(); } catch(e) {} });
+  }, 30);
 }
+
+// Also resize on initial load after DOM settles
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    Chart.instances.forEach(c => { try { c.resize(); } catch(e) {} });
+  }, 100);
+});
 </script>
 </body>
 </html>
